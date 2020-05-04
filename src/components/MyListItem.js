@@ -6,16 +6,7 @@ import {
   faCheckCircle,
   faTrashAlt,
 } from '@fortawesome/free-regular-svg-icons'
-import styled from 'styled-components'
 import { findIndex, remove } from 'lodash'
-
-// const Div = styled.div`
-const Div = styled.div`
-  border: 1px solid;
-  padding: 15px;
-  font-size: 25px;
-  text-decoration: ${(props) => (props.completed ? 'line-through' : 'none')};
-`
 
 export default function MyListItem({
   itemkey,
@@ -27,27 +18,13 @@ export default function MyListItem({
   setDailyTasks,
 }) {
   const [completed, setCompleted] = useState(isCompleted)
+  const [deleted, setDeleted] = useState(false)
 
   function handleClick(e) {
-    // console.log('you rang?')
-    // setCompleted(!completed)
-    // handleTap(e)
-
     const task = text
     const newtasklist = todaysTasks.slice()
 
-    if (e.target.id === 'delete-item') {
-      const shouldDelete = window.confirm('Are you sure you want to delete??')
-      console.log('should delete? ', shouldDelete)
-
-      if (shouldDelete) {
-        console.log('this should be deleted')
-        const removedTaskList = remove(newtasklist, (t) => t.task === task)
-
-        setTodaysTasks(newtasklist)
-        setDailyTasks(newtasklist)
-      }
-
+    if (e?.target?.id === 'delete-item' || deleted) {
       return
     }
 
@@ -58,28 +35,67 @@ export default function MyListItem({
     setTodaysTasks(newtasklist)
   }
 
+  function handleDelete(event) {
+    // console.log('delete event', event.target.id)
+    const shouldDelete = window.confirm('Are you sure you want to delete??')
+    console.log('should delete? ', shouldDelete)
+
+    const newtasklist = todaysTasks.slice()
+
+    if (shouldDelete) {
+      console.log('this should be deleted')
+      remove(newtasklist, (t) => t.task === text)
+
+      setDeleted(true)
+
+      setTodaysTasks(newtasklist)
+      setDailyTasks(newtasklist)
+    }
+
+    return
+  }
+
   return (
-    <Div completed={completed} onClick={handleClick} id={itemkey}>
-      <FontAwesomeIcon
-        icon={completed ? faCheckCircle : faCircle}
-        className="mr-3"
-        // id={itemkey}
-      />
-      <span>{text}</span>
-      <FontAwesomeIcon
-        icon={faTrashAlt}
-        className="float-right"
+    <div
+      className={`
+        max-w-sm 
+        flex 
+        mx-auto 
+        m-3 
+        p-5
+        bg-white 
+        rounded-lg 
+        shadow-lg 
+        ${completed ? 'bg-gray-100  text-gray-500' : 'hover:bg-blue-100'}
+        `}
+      id={itemkey}
+    >
+      <div className="mr-3 text-xl" onClick={handleClick}>
+        <FontAwesomeIcon
+          icon={completed ? faCheckCircle : faCircle}
+          className=""
+        />
+      </div>
+
+      <div
+        className={`flex-grow ${completed ? 'line-through' : ''}`}
+        onClick={handleClick}
+      >
+        <span className="text-2xl">{text}</span>
+      </div>
+
+      <button
         id="delete-item"
-        // onClick={(e) => {
-        //   console.log('deleting ', text)
-        // }}
-      />
-    </Div>
+        onClick={handleDelete}
+        className="text-2xl hover:bg-red-500 rounded py-1 px-1"
+      >
+        <FontAwesomeIcon icon={faTrashAlt} />
+      </button>
+    </div>
   )
 }
 
 MyListItem.propTypes = {
-  // itemkey: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   isCompleted: PropTypes.bool,
   handleTap: PropTypes.func,

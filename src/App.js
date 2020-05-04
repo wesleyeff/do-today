@@ -2,8 +2,8 @@
  * Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
  */
 
-import React, { useEffect, useState } from 'react'
-import { findIndex } from 'lodash'
+import React, { useEffect } from 'react'
+import PWAPrompt from 'react-ios-pwa-prompt'
 
 import Navbar from './components/Navbar'
 import MyListItem from './components/MyListItem'
@@ -27,20 +27,20 @@ function App() {
       },
     ]
 
-    // const storedDailytasks =  : []
     if (!dailyTasks) {
-      // setDailyTasks(JSON.stringify(defaultTasks))
       setDailyTasks(defaultTasks)
+      setTodaysTasks(defaultTasks)
     }
-    if (!todaysTasks) {
-      const clearedTodaysTasks = dailyTasks.map((t) => {
+
+    if (!todaysTasks && dailyTasks) {
+      dailyTasks.map((t) => {
         t.completed = false
 
         return t
       })
       setTodaysTasks(dailyTasks)
     }
-  }, [dailyTasks, setDailyTasks, setTodaysTasks])
+  }, [dailyTasks, setDailyTasks, setTodaysTasks, todaysTasks])
 
   function newTodo(e) {
     const newtasktext = prompt('Enter new daily task')
@@ -61,23 +61,26 @@ function App() {
   return (
     <div className="App">
       <Navbar newTodo={newTodo} />
-      {todaysTasks && todaysTasks.length > 0 ? (
-        todaysTasks.map((t) => (
-          <MyListItem
-            key={t.task}
-            // itemkey={t.task}
-            text={t.task}
-            isCompleted={t.completed}
-            // handleTap={handleTap}
-            todaysTasks={todaysTasks}
-            setTodaysTasks={setTodaysTasks}
-            dailyTasks={dailyTasks}
-            setDailyTasks={setDailyTasks}
-          />
-        ))
-      ) : (
-        <div>No tasks today!</div>
-      )}
+      <div className="mx-2 mt-20">
+        {todaysTasks && todaysTasks.length > 0 ? (
+          todaysTasks.map((t) => (
+            <MyListItem
+              key={t.task}
+              // itemkey={t.task}
+              text={t.task}
+              isCompleted={t.completed}
+              // handleTap={handleTap}
+              todaysTasks={todaysTasks}
+              setTodaysTasks={setTodaysTasks}
+              dailyTasks={dailyTasks}
+              setDailyTasks={setDailyTasks}
+            />
+          ))
+        ) : (
+          <div>No tasks today!</div>
+        )}
+      </div>
+      <PWAPrompt timesToShow={10} permanentlyHideOnDismiss={false} />
     </div>
   )
 }
